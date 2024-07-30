@@ -3,17 +3,23 @@ from pathlib import Path
 
 # Print the main menu
 def MainMenu():
-    # Get input
+    # Display menu
     while(True):
         time.sleep(0.5)
-        print("---\nYou have x amount of gametime\n---") # To be changed later
-        print(" Please select an option:")
-        print(" 1. Start gametime")
-        print(" 2. Log gametime")
-        print(" 3. Start non-gametime")
-        print(" 4. Log non-gametime")
+
+        workTime, gameTime, modifier = ReadData()
+        print(f"---\nWork time: {workTime} minutes\t" + MakeTimeBar(workTime))
+        print(f"Game time: {gameTime} minutes\t" + MakeTimeBar(gameTime))
+        print(f"Modifier is set to {modifier}\n---")
+
+        print("Please select an option:")
+        print(" 1. Start work time")
+        print(" 2. Log work time")
+        print(" 3. Start game time")
+        print(" 4. Log game time")
         print(" 9. Change settings")
         print(" 0. Exit")
+        
         # Parse input
         selection = input()
         try:
@@ -24,15 +30,15 @@ def MainMenu():
 
         # Interpret seletion to choice
         if selection == 1:
-            Gametime()
+            WorkTime()
         elif selection == 2:
-            print("[Log gametime]")
+            print("[Log work time]")
         elif selection == 3:
-            NonGametime()
+            GameTime()
         elif selection == 4:
-            print("[Log non-gametime]")
+            print("[Log game time]")
         elif selection == 9:
-            print("[Settings]")
+            ChangeSettings()
         elif selection == 0:
             sys.exit()
         else:
@@ -43,9 +49,6 @@ def MainMenu():
 def GetDirectory():
     if (sys.platform == "win32"):
         DIRECTORY = Path.home() / "AppData/Local/time_balancer"
-        if (not DIRECTORY.exists()):
-            DIRECTORY.mkdir()
-        return DIRECTORY
     
     elif (sys.platform == "darwin"):
         DIRECTORY = Path("/Library/Caches/time_balancer")
@@ -60,25 +63,43 @@ def GetDirectory():
     
     else:
         raise Exception("Unrecognised operating system")
-
-
-def ReadData():
-    pass
+    
+    if (not DIRECTORY.exists()):
+            # Make a blank file if it doesn't exist
+            DIRECTORY.mkdir()
+            TIMES_FILE_DIR = DIRECTORY / "times.txt"
+            FILE = open(TIMES_FILE_DIR, "w")
+            FILE.write("0\n0\n1.5")
+            FILE.close()
+    
+    return DIRECTORY
 
 
 # Writes the gametime and non-gametime to a text file
-def WriteData(gameTime = 0, nonGameTime = 0):
+def WriteData(workTime, gameTime, modifier):
     DIRECTORY = GetDirectory()
     TIMES_FILE_DIR = DIRECTORY / "times.txt"
 
     FILE = open(TIMES_FILE_DIR, "w")
-    FILE.write(str(int(gameTime)) + "\n" + str(int(nonGameTime)))
+    FILE.write(str(workTime) + "\n" + str(gameTime) + "\n" + str(modifier))
     FILE.close()
 
 
+# Reads the stored times, returns ints as gameTime, nonGameTime, modifier
+def ReadData():
+    DIRECTORY = GetDirectory()
+    TIMES_FILE_DIR = DIRECTORY / "times.txt"
+
+    FILE = open(TIMES_FILE_DIR, "r")
+    workTime = FILE.readline()
+    gameTime = FILE.readline()
+    modifier = FILE.readline()
+    return int(workTime), int(gameTime), float(modifier)
+
+
 # Turns every 15 mins into a string of '#'
-def MakeTimeBar(seconds):
-    numHashes = int(seconds) / 900
+def MakeTimeBar(minutes):
+    numHashes = int(minutes) / 15
     return ("#" * int(numHashes))
 
 
@@ -93,24 +114,49 @@ def StartTimer():
     endTime = time.time()
     timeDifference =  endTime - startTime
     print("Timer lasted for " + str(int(timeDifference / 60)) + " minutes")
-    return timeDifference
+    return int(timeDifference / 60)
 
 
-def Gametime():
-    print("Starting timer for gametime")
+def WorkTime():
+    print("Starting timer for work time")
     timeSpent = StartTimer()
 
-    ReadData()
-    # TODO: Read existing times, calculate into new variables
+    # Read existing times, calculate into new variables
+    workTime, gameTime, modifier = ReadData()
 
-    WriteData(gameTime = timeSpent)
-    # Write timeSpent to times.txt
+    # Calculate new times
+    workTime += timeSpent
+    # TODO: subtract time x from time y using a modifiable value
+
+    # Update times.txt with new values
+    WriteData(workTime, gameTime, modifier)
 
 
-def NonGametime():
-    print("Starting timer for non-gametime")
+def GameTime():
+    print("Starting timer for game time")
     timeSpent = StartTimer()
-    # Write timeSpent to AppData\Local
+
+    # Read existing times, calculate into new variables
+    workTime, gameTime, modifier = ReadData()
+
+    # Calculate new times
+    gameTime += timeSpent
+    # TODO: subtract time x from time y using a modifiable value
+
+    # Update times.txt with new values
+    WriteData(workTime, gameTime, modifier)
+
+
+def ChangeSettings():
+    workTime, gameTime, modifier = ReadData()
+    print("-- Settings --")
+    print(f"Modifier is currently set to {modifier}")
+    print(f"Every {modifier} minutes of work gives you one minute of gametime")
+
+    selection = input("Enter a new value for the modifier if you wish to change it, or press return to go back")
+    if selection.isnumeric:
+        modifier = float(selection)
+        WriteData(workTime, gameTime, modifier)
 
 
 # Start of program
