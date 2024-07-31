@@ -1,4 +1,4 @@
-import sys, os, time
+import sys, time
 from pathlib import Path
 
 # Print the main menu
