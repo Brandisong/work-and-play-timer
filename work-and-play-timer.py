@@ -1,4 +1,4 @@
-import sys, time
+import sys, os, time
 from pathlib import Path
 
 # Print the main menu
@@ -48,14 +48,10 @@ def MainMenu():
 # Get config file directory
 def GetDirectory():
     if (sys.platform == "win32"):
-        DIRECTORY = Path.home() / "AppData/Local/time_balancer"
+        DIRECTORY = Path.home() / "AppData/Local/work_and_play_timer"
     
     elif (sys.platform == "darwin"):
-        DIRECTORY = Path("/Library/Caches/time_balancer")
-        if (not DIRECTORY.exists()):
-            DIRECTORY.mkdir()
-        return DIRECTORY
-        # TODO: Make sure mac stuff works
+        DIRECTORY = Path("/Library/Application Support/work_and_play_timer")
     
     elif (sys.platform == "linux"):
         # TODO: Make linux stuff
@@ -153,10 +149,13 @@ def ChangeSettings():
     print(f"Modifier is currently set to {modifier}")
     print(f"Every {modifier} minutes of work gives you one minute of gametime")
 
-    selection = input("Enter a new value for the modifier if you wish to change it, or press return to go back")
-    if selection.isnumeric:
-        modifier = float(selection)
-        WriteData(workTime, gameTime, modifier)
+    selection = input("Enter a new value for the modifier if you wish to change it, or press return to go back\n")
+    if selection!= '':
+        try:
+            modifier = float(selection)
+            WriteData(workTime, gameTime, modifier)
+        except:
+            print("Invalid input")
 
 
 # Start of program
