@@ -102,7 +102,6 @@ def MakeTimeBar(minutes):
         return ("-" * int(numHashes))
     else:
         return ""
-    
 
 
 # Timer used for both game and break time
@@ -148,7 +147,7 @@ def GameTime():
 
 
 def LogWorkTime():
-    print("How much time do you want to add?")
+    print("How much time do you want to add? (mins)")
     while(True):
         loggedTime = input("> ")
         try:
@@ -168,7 +167,7 @@ def LogWorkTime():
 
 
 def LogGameTime():
-    print("How much time do you want to subtract?")
+    print("How much time do you want to subtract? (mins)")
     while(True):
         loggedTime = input("> ")
         try:
