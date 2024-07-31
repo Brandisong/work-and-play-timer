@@ -7,10 +7,12 @@ def MainMenu():
     while(True):
         time.sleep(0.5)
 
-        workTime, gameTime, modifier = ReadData()
-        print(f"---\nWork time: {workTime} minutes\t" + MakeTimeBar(workTime))
-        print(f"Game time: {gameTime} minutes\t" + MakeTimeBar(gameTime))
-        print(f"Modifier is set to {modifier}\n---")
+        workTime, modifier = ReadData()
+        print("-"*26)
+        print(f"You have {workTime} minutes stored")
+        print(":" + MakeTimeBar(workTime) + ":")
+        print(f"Modifier is set to {modifier}")
+        print("-"*26)
 
         print("Please select an option:")
         print(" 1. Start work time")
@@ -21,7 +23,7 @@ def MainMenu():
         print(" 0. Exit")
         
         # Parse input
-        selection = input()
+        selection = input("> ")
         try:
             selection = int(selection)
         except:
@@ -32,11 +34,11 @@ def MainMenu():
         if selection == 1:
             WorkTime()
         elif selection == 2:
-            print("[Log work time]")
+            LogWorkTime()
         elif selection == 3:
             GameTime()
         elif selection == 4:
-            print("[Log game time]")
+            LogGameTime()
         elif selection == 9:
             ChangeSettings()
         elif selection == 0:
@@ -48,14 +50,10 @@ def MainMenu():
 # Get config file directory
 def GetDirectory():
     if (sys.platform == "win32"):
-        DIRECTORY = Path.home() / "AppData/Local/work_and_play_timer"
+        DIRECTORY = Path.home() / "AppData/Local/wp_timer"
     
-    elif (sys.platform == "darwin"):
-        DIRECTORY = Path("/Library/Application Support/work_and_play_timer")
-    
-    elif (sys.platform == "linux"):
-        # TODO: Make linux stuff
-        pass
+    elif (sys.platform == "darwin") or (sys.platform == "linux"):
+        DIRECTORY = Path.home() / "Documents/wp_timer"
     
     else:
         raise Exception("Unrecognised operating system")
@@ -65,19 +63,19 @@ def GetDirectory():
             DIRECTORY.mkdir()
             TIMES_FILE_DIR = DIRECTORY / "times.txt"
             FILE = open(TIMES_FILE_DIR, "w")
-            FILE.write("0\n0\n1.5")
+            FILE.write("0\n1.0")
             FILE.close()
     
     return DIRECTORY
 
 
 # Writes the gametime and non-gametime to a text file
-def WriteData(workTime, gameTime, modifier):
+def WriteData(workTime, modifier):
     DIRECTORY = GetDirectory()
     TIMES_FILE_DIR = DIRECTORY / "times.txt"
 
     FILE = open(TIMES_FILE_DIR, "w")
-    FILE.write(str(workTime) + "\n" + str(gameTime) + "\n" + str(modifier))
+    FILE.write(str(workTime) + "\n" + str(modifier))
     FILE.close()
 
 
@@ -88,15 +86,23 @@ def ReadData():
 
     FILE = open(TIMES_FILE_DIR, "r")
     workTime = FILE.readline()
-    gameTime = FILE.readline()
     modifier = FILE.readline()
-    return int(workTime), int(gameTime), float(modifier)
+    return int(workTime), float(modifier)
 
 
 # Turns every 15 mins into a string of '#'
 def MakeTimeBar(minutes):
-    numHashes = int(minutes) / 15
-    return ("#" * int(numHashes))
+    # If positive, print hashes
+    if (minutes > 1):
+        numHashes = int(minutes) / 15
+        return ("#" * int(numHashes))
+    # If negative, print dashes
+    elif (minutes < 1):
+        numHashes = int(abs(minutes)) / 15
+        return ("-" * int(numHashes))
+    else:
+        return ""
+    
 
 
 # Timer used for both game and break time
@@ -105,7 +111,7 @@ def StartTimer():
     print("Timer started at " + time.ctime(startTime)[11:16]) # Display hr:m
 
     # Wait for input
-    input("Press return to stop timer")
+    input("Press return to stop timer ")
 
     endTime = time.time()
     timeDifference =  endTime - startTime
@@ -118,14 +124,13 @@ def WorkTime():
     timeSpent = StartTimer()
 
     # Read existing times, calculate into new variables
-    workTime, gameTime, modifier = ReadData()
+    workTime, modifier = ReadData()
 
     # Calculate new times
-    workTime += timeSpent
-    # TODO: subtract time x from time y using a modifiable value
+    workTime += int(timeSpent * modifier)
 
     # Update times.txt with new values
-    WriteData(workTime, gameTime, modifier)
+    WriteData(workTime, modifier)
 
 
 def GameTime():
@@ -133,27 +138,66 @@ def GameTime():
     timeSpent = StartTimer()
 
     # Read existing times, calculate into new variables
-    workTime, gameTime, modifier = ReadData()
+    workTime, modifier = ReadData()
 
     # Calculate new times
-    gameTime += timeSpent
-    # TODO: subtract time x from time y using a modifiable value
+    workTime -= timeSpent
 
     # Update times.txt with new values
-    WriteData(workTime, gameTime, modifier)
+    WriteData(workTime, modifier)
+
+
+def LogWorkTime():
+    print("How much time do you want to add?")
+    while(True):
+        loggedTime = input("> ")
+        try:
+            loggedTime = int(loggedTime)
+            break
+        except:
+            print("Invalid input, please try again")
+
+    # Read existing times, calculate into new variables
+    workTime, modifier = ReadData()
+
+    # Calculate new times
+    workTime += int(loggedTime * modifier)
+
+    # Update times.txt with new values
+    WriteData(workTime, modifier)
+
+
+def LogGameTime():
+    print("How much time do you want to subtract?")
+    while(True):
+        loggedTime = input("> ")
+        try:
+            loggedTime = int(loggedTime)
+            break
+        except:
+            print("Invalid input, please try again")
+
+    # Read existing times, calculate into new variables
+    workTime, modifier = ReadData()
+
+    # Calculate new times
+    workTime -= int(loggedTime)
+
+    # Update times.txt with new values
+    WriteData(workTime, modifier)
 
 
 def ChangeSettings():
-    workTime, gameTime, modifier = ReadData()
+    workTime, modifier = ReadData()
     print("-- Settings --")
     print(f"Modifier is currently set to {modifier}")
-    print(f"Every {modifier} minutes of work gives you one minute of gametime")
+    print(f"Every 1 minute of work gives you {modifier} minute(s) of gametime")
 
-    selection = input("Enter a new value for the modifier if you wish to change it, or press return to go back\n")
+    selection = input("Enter a new value for the modifier if you wish to change it, or press return to go back\n> ")
     if selection!= '':
         try:
             modifier = float(selection)
-            WriteData(workTime, gameTime, modifier)
+            WriteData(workTime, modifier)
         except:
             print("Invalid input")
 
