@@ -56,7 +56,10 @@ def GetDirectory():
         DIRECTORY = Path.home() / "Documents/wp_timer"
     
     else:
-        raise Exception("Unrecognised operating system")
+        try:
+            DIRECTORY = Path.home() / "Documents/wp_timer"
+        except:
+            raise Exception("Unrecognised operating system")
     
     if (not DIRECTORY.exists()):
             # Make a blank file if it doesn't exist
@@ -127,6 +130,7 @@ def WorkTime():
 
     # Calculate new times
     workTime += int(timeSpent * modifier)
+    print(f"You have earned {workTime} minutes of gametime")
 
     # Update times.txt with new values
     WriteData(workTime, modifier)
@@ -161,6 +165,7 @@ def LogWorkTime():
 
     # Calculate new times
     workTime += int(loggedTime * modifier)
+    print(f"{workTime} minutes of gametime added")
 
     # Update times.txt with new values
     WriteData(workTime, modifier)
