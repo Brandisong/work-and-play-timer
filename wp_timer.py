@@ -130,7 +130,7 @@ def WorkTime():
 
     # Calculate new times
     workTime += int(timeSpent * modifier)
-    print(f"You have earned {workTime} minutes of gametime")
+    print(f"You have earned {int(timeSpent * modifier)} minutes of gametime")
 
     # Update times.txt with new values
     WriteData(workTime, modifier)
@@ -165,7 +165,7 @@ def LogWorkTime():
 
     # Calculate new times
     workTime += int(loggedTime * modifier)
-    print(f"{workTime} minutes of gametime added")
+    print(f"{int(loggedTime * modifier)} minutes of gametime added")
 
     # Update times.txt with new values
     WriteData(workTime, modifier)
