@@ -1,5 +1,6 @@
 import sys, time
 from pathlib import Path
+from os import system # Only used to clear cmdline
 
 # Print the main menu
 def MainMenu():
@@ -42,6 +43,7 @@ def MainMenu():
         elif selection == 9:
             ChangeSettings()
         elif selection == 0:
+            Clear()
             sys.exit()
         else:
             print("Error: invalid input")
@@ -93,6 +95,14 @@ def ReadData():
     return int(workTime), float(modifier)
 
 
+# Clears cmdline based on OS
+def Clear():
+    if sys.platform == "win32":
+        system('cls')
+    else:
+        system('clear')
+
+
 # Turns every 15 mins into a string of '#'
 def MakeTimeBar(minutes):
     # If positive, print hashes
@@ -117,11 +127,15 @@ def StartTimer():
 
     endTime = time.time()
     timeDifference =  endTime - startTime
+
+    Clear()
     print("Timer lasted for " + str(int(timeDifference / 60)) + " minutes")
     return int(timeDifference / 60)
 
 
+# Menu for starting work time
 def WorkTime():
+    Clear()
     print("Starting timer for work time")
     timeSpent = StartTimer()
 
@@ -136,7 +150,9 @@ def WorkTime():
     WriteData(workTime, modifier)
 
 
+# Menu for starting game time
 def GameTime():
+    Clear()
     print("Starting timer for game time")
     timeSpent = StartTimer()
 
@@ -150,6 +166,7 @@ def GameTime():
     WriteData(workTime, modifier)
 
 
+# Log work time outside of the timer
 def LogWorkTime():
     print("How much time do you want to add? (mins)")
     while(True):
@@ -171,6 +188,7 @@ def LogWorkTime():
     WriteData(workTime, modifier)
 
 
+# Log game time outside of the timer
 def LogGameTime():
     print("How much time do you want to subtract? (mins)")
     while(True):
@@ -191,6 +209,7 @@ def LogGameTime():
     WriteData(workTime, modifier)
 
 
+# Currently just changes the modifier value
 def ChangeSettings():
     workTime, modifier = ReadData()
     print("-- Settings --")
@@ -204,6 +223,8 @@ def ChangeSettings():
             WriteData(workTime, modifier)
         except:
             print("Invalid input")
+    
+    Clear()
 
 
 # Start of program
