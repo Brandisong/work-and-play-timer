@@ -9,11 +9,11 @@ def MainMenu():
         time.sleep(0.5)
 
         workTime, modifier = ReadData()
-        print("-"*26)
+        print("-"*(24+len(str(workTime)))) # Adjusts bar to second line's length
         print(f"You have {workTime} minutes stored")
         print(":" + MakeTimeBar(workTime) + ":")
         print(f"Modifier is set to {modifier}")
-        print("-"*26)
+        print("-"*(24+len(str(workTime))))
 
         print("Please select an option:")
         print(" 1. Start work time")
