@@ -21,8 +21,8 @@ def main_menu():
 
         print("Please select an option:")
         print(" 1. Start work time")
-        print(" 2. Log work time")
-        print(" 3. Start game time")
+        print(" 2. Start game time")
+        print(" 3. Log work time")
         print(" 4. Log game time")
         print(" 9. Change settings")
         print(" 0. Exit")
@@ -37,11 +37,11 @@ def main_menu():
 
         # Interpret seletion to choice
         if selection == 1:
-            work_time()
+            start_work_time()
         elif selection == 2:
-            log_work_time()
+            start_game_time()
         elif selection == 3:
-            game_time()
+            log_work_time()
         elif selection == 4:
             log_game_time()
         elif selection == 9:
@@ -138,7 +138,7 @@ def start_timer():
 
 
 # Menu for starting work time
-def work_time():
+def start_work_time():
     clear()
     print("Starting timer for work time")
     time_spent = start_timer()
@@ -155,7 +155,7 @@ def work_time():
 
 
 # Menu for starting game time
-def game_time():
+def start_game_time():
     clear()
     print("Starting timer for game time")
     time_spent = start_timer()
